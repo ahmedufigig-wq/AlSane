@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
     <application android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:label="مخزني" android:icon="@drawable/ic_launcher" android:usesCleartextTraffic="true">
         <activity android:name=".MainActivity" android:exported="true">
