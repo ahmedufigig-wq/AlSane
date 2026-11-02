@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>الصانع</title>
+<style>
+:root{--gold:#d9ad4c;--bg:#101010;--panel:#1b1b1b;--muted:#aaa;--line:#343434}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#f7f3e9;font-family:Arial,Tahoma,sans-serif;padding-bottom:85px}
+header{background:linear-gradient(130deg,#17130b,#29200e);padding:18px 16px;border-bottom:1px solid #765b22;display:flex;align-items:center;gap:12px}
+header img{width:58px;height:58px;object-fit:cover;border-radius:14px;border:1px solid var(--gold)}
+h1{font-size:24px;color:var(--gold);margin:0}header small{color:#d7c79f}
+main{padding:14px;max-width:760px;margin:auto}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card small{color:var(--muted)}.num{font-size:22px;color:var(--gold);font-weight:bold;margin-top:8px}
+h2{font-size:18px;color:var(--gold);margin:8px 0 14px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#171717;border-top:1px solid #57451f;display:flex;overflow-x:auto;z-index:3}
+nav button{background:none;border:0;color:#c9c1ad;padding:12px 13px;min-width:75px;font-size:12px}
+nav button.active{color:var(--gold);background:#292211}
+button,.btn{background:var(--gold);color:#17130b;border:0;border-radius:9px;padding:11px 14px;font-weight:bold}
+input,select{width:100%;padding:12px;margin:6px 0 12px;background:#101010;border:1px solid #4b4537;color:white;border-radius:8px;font-size:16px}
+label{color:#d4c7a5;font-size:13px}form{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}form .wide{grid-column:1/-1}
+.item{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:11px 0;font-size:14px}
+.item:last-child{border:0}.muted{color:var(--muted);font-size:12px}.danger{background:#713333;color:white}.good{color:#8bd49b}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.empty{color:var(--muted);text-align:center;padding:20px}
+@media(max-width:390px){form{grid-template-columns:1fr}.cards{gap:7px}.card{padding:10px}}
+</style></head><body>
+<header><div style="width:58px;height:58px;border-radius:14px;border:1px solid var(--gold);display:grid;place-items:center;color:var(--gold);font-size:28px">✦</div><div><h1>الصانع</h1><small>إدارة شاملة لبقالتك • يعمل دون إنترنت</small></div></header>
+<main id="app"></main>
+<nav id="nav"></nav>
+<script>
+const tabs=[['home','الرئيسية'],['sales','المبيعات'],['products','الأصناف'],['debts','ديون الزبائن'],['suppliers','الموردون'],['expenses','المصروفات'],['reports','التقارير']];
+let db=JSON.parse(localStorage.getItem('alsane_db')||'{"products":[],"sales":[],"debts":[],"suppliers":[],"expenses":[]}');
+let page='home';const save=()=>localStorage.setItem('alsane_db',JSON.stringify(db));
+const money=n=>(Number(n)||0).toLocaleString('ar-EG')+' ر.ي';
+const sum=(a,k)=>a.reduce((s,x)=>s+(Number(x[k])||0),0);
+function nav(){document.getElementById('nav').innerHTML=tabs.map(t=>'<button class="'+(page===t[0]?'active':'')+'" onclick="go(\''+t[0]+'\')">'+t[1]+'</button>').join('')}
+function go(p){page=p;render()}
+function field(name,label,type='text',required=true){return '<div><label>'+label+'</label><input name="'+name+'" type="'+type+'" '+(required?'required':'')+'></div>'}
+function list(arr){if(!arr.length)return '<div class="empty">لا توجد بيانات بعد</div>';return arr.slice().reverse().map(x=>'<div class="item"><div><b>'+(x.name||x.product||x.note||'عملية')+'</b><div class="muted">'+(x.date||'')+' '+(x.detail||'')+'</div></div><div><b>'+money(x.amount||x.total||0)+'</b></div></div>').join('')}
+function dashboard(){let sales=sum(db.sales,'total'),cost=sum(db.sales,'cost'),expenses=sum(db.expenses,'amount'),debts=sum(db.debts,'remaining');return '<div class="cards"><div class="card"><small>إجمالي المبيعات</small><div class="num">'+money(sales)+'</div></div><div class="card"><small>الربح قبل المصروفات</small><div class="num">'+money(sales-cost)+'</div></div><div class="card"><small>المصروفات</small><div class="num">'+money(expenses)+'</div></div><div class="card"><small>ديون الزبائن المتبقية</small><div class="num">'+money(debts)+'</div></div></div><section class="panel"><h2>مرحباً بك في الصانع</h2><p>سجّل مبيعاتك وديونك ومصروفاتك، وسيتولى التطبيق ترتيب الحسابات محلياً على هاتفك.</p><div class="actions"><button onclick="go(\'sales\')">تسجيل بيع</button><button onclick="go(\'products\')">إضافة صنف</button><button onclick="go(\'debts\')">إضافة دين</button></div></section><section class="panel"><h2>آخر المبيعات</h2>'+list(db.sales)+'</section>'}
+function formPage(title,desc,fields,button){return '<section class="panel"><h2>'+title+'</h2><p class="muted">'+desc+'</p><form id="entry">'+fields+'<div class="wide"><button type="submit">'+button+'</button></div></form></section>'}
+function products(){return formPage('إضافة صنف','أدخل سعر الشراء والبيع والكمية.',field('name','اسم الصنف')+field('buy','سعر الشراء','number')+field('sell','سعر البيع','number')+field('qty','الكمية','number'),'حفظ الصنف')+'<section class="panel"><h2>قائمة الأصناف ('+db.products.length+')</h2>'+(db.products.map(p=>'<div class="item"><div><b>'+p.name+'</b><div class="muted">شراء '+money(p.buy)+' • بيع '+money(p.sell)+' • كمية '+p.qty+'</div></div></div>').join('')||'<div class="empty">لا توجد أصناف</div>')+'</section>'}
+function sales(){return formPage('تسجيل عملية بيع','سجّل البيع يدوياً، وسيحسب التطبيق الربح.',field('name','اسم المنتج أو تفاصيل البيع')+field('total','إجمالي البيع','number')+field('cost','تكلفة البضاعة','number')+field('date','التاريخ','date'),'حفظ البيع')+'<section class="panel"><h2>سجل المبيعات</h2>'+list(db.sales)+'</section>'}
+function debts(){return formPage('إضافة دين زبون','سجل المبلغ وما تم سداده.',field('name','اسم الزبون')+field('amount','المبلغ الأصلي','number')+field('paid','المبلغ المسدد','number')+field('date','التاريخ','date'),'حفظ الدين')+'<section class="panel"><h2>حسابات الزبائن</h2>'+(db.debts.map(d=>'<div class="item"><div><b>'+d.name+'</b><div class="muted">الأصل '+money(d.amount)+' • المسدد '+money(d.paid)+'</div></div><b>'+money(d.remaining)+'</b></div>').join('')||'<div class="empty">لا توجد ديون مسجلة</div>')+'</section>'}
+function suppliers(){return formPage('إضافة مورد','سجل بيانات المورد والمبلغ المستحق.',field('name','اسم المورد')+field('phone','رقم الهاتف')+field('amount','المبلغ المستحق','number'),'حفظ المورد')+'<section class="panel"><h2>الموردون</h2>'+(db.suppliers.map(s=>'<div class="item"><div><b>'+s.name+'</b><div class="muted">'+(s.phone||'')+'</div></div><b>'+money(s.amount)+'</b></div>').join('')||'<div class="empty">لا يوجد موردون</div>')+'</section>'}
+function expenses(){return formPage('تسجيل مصروف','مثل الإيجار والكهرباء والنقل والأجور.',field('note','نوع المصروف')+field('amount','المبلغ','number')+field('date','التاريخ','date'),'حفظ المصروف')+'<section class="panel"><h2>سجل المصروفات</h2>'+list(db.expenses)+'</section>'}
+function reports(){let sales=sum(db.sales,'total'),cost=sum(db.sales,'cost'),expenses=sum(db.expenses,'amount'),debts=sum(db.debts,'remaining');return '<section class="panel"><h2>ملخص الحسابات</h2>'+[['إجمالي المبيعات',sales],['تكلفة البضاعة المباعة',cost],['الربح الإجمالي',sales-cost],['المصروفات',expenses],['صافي الربح التقديري',sales-cost-expenses],['ديون الزبائن',debts]].map(x=>'<div class="item"><span>'+x[0]+'</span><b>'+money(x[1])+'</b></div>').join('')+'<p class="muted">هذه التقارير مبنية على العمليات التي سجلتها داخل التطبيق.</p><button onclick="exportData()">تصدير نسخة احتياطية</button></section>'}
+function exportData(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download='alsane-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function render(){nav();let el=document.getElementById('app');el.innerHTML=page==='home'?dashboard():page==='products'?products():page==='sales'?sales():page==='debts'?debts():page==='suppliers'?suppliers():page==='expenses'?expenses():reports();let f=document.getElementById('entry');if(f)f.onsubmit=e=>{e.preventDefault();let d=Object.fromEntries(new FormData(f));if(page==='products')db.products.push({name:d.name,buy:+d.buy,sell:+d.sell,qty:+d.qty});if(page==='sales')db.sales.push({name:d.name,total:+d.total,cost:+d.cost,date:d.date||new Date().toISOString().slice(0,10)});if(page==='debts')db.debts.push({name:d.name,amount:+d.amount,paid:+d.paid,remaining:+d.amount-(+d.paid),date:d.date});if(page==='suppliers')db.suppliers.push(d);if(page==='expenses')db.expenses.push({note:d.note,amount:+d.amount,date:d.date});save();render();alert('تم الحفظ بنجاح')}}
+render();
+</script></body></html>
