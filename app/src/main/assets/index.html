@@ -2,23 +2,23 @@
 <html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>الصانع</title>
 <style>
-:root{--gold:#d9ad4c;--bg:#101010;--panel:#1b1b1b;--muted:#aaa;--line:#343434}*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#f7f3e9;font-family:Arial,Tahoma,sans-serif;padding-bottom:85px}
-header{background:linear-gradient(130deg,#17130b,#29200e);padding:18px 16px;border-bottom:1px solid #765b22;display:flex;align-items:center;gap:12px}
+:root{--gold:#d9ad4c;--bg:#eef3f5;--panel:#ffffff;--muted:#637381;--line:#d9e2e7;--ink:#183747;--teal:#087f8c;--teal2:#075b68}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Tahoma,sans-serif;padding-bottom:85px}
+header{background:linear-gradient(130deg,#123746,#087f8c);padding:18px 16px;border-bottom:3px solid #d9ad4c;display:flex;align-items:center;gap:12px}
 header img{width:58px;height:58px;object-fit:cover;border-radius:14px;border:1px solid var(--gold)}
-h1{font-size:24px;color:var(--gold);margin:0}header small{color:#d7c79f}
+h1{font-size:24px;color:#fff;margin:0}header small{color:#d9edf0}
 main{padding:14px;max-width:760px;margin:auto}.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
-.card small{color:var(--muted)}.num{font-size:22px;color:var(--gold);font-weight:bold;margin-top:8px}
-h2{font-size:18px;color:var(--gold);margin:8px 0 14px}
-nav{position:fixed;bottom:0;left:0;right:0;background:#171717;border-top:1px solid #57451f;display:flex;overflow-x:auto;z-index:3}
-nav button{background:none;border:0;color:#c9c1ad;padding:12px 13px;min-width:75px;font-size:12px}
-nav button.active{color:var(--gold);background:#292211}
-button,.btn{background:var(--gold);color:#17130b;border:0;border-radius:9px;padding:11px 14px;font-weight:bold}
-input,select{width:100%;padding:12px;margin:6px 0 12px;background:#101010;border:1px solid #4b4537;color:white;border-radius:8px;font-size:16px}
-label{color:#d4c7a5;font-size:13px}form{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}form .wide{grid-column:1/-1}
+.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:12px;box-shadow:0 3px 12px #18374710}
+.card small{color:var(--muted)}.num{font-size:22px;color:var(--teal);font-weight:bold;margin-top:8px}
+h2{font-size:18px;color:var(--teal);margin:8px 0 14px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#123746;border-top:2px solid #d9ad4c;display:flex;overflow-x:auto;z-index:3}
+nav button{background:none;border:0;color:#d9edf0;padding:12px 13px;min-width:75px;font-size:12px}
+nav button.active{color:#fff;background:#087f8c}
+button,.btn{background:var(--teal);color:#fff;border:0;border-radius:9px;padding:11px 14px;font-weight:bold}
+input,select{width:100%;padding:12px;margin:6px 0 12px;background:#f8fbfc;border:1px solid #c6d5dc;color:#183747;border-radius:8px;font-size:16px}
+label{color:#315768;font-size:13px}form{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}form .wide{grid-column:1/-1}
 .item{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:11px 0;font-size:14px}
-.item:last-child{border:0}.muted{color:var(--muted);font-size:12px}.danger{background:#713333;color:white}.good{color:#8bd49b}
+.item:last-child{border:0}.muted{color:var(--muted);font-size:12px}.danger{background:#713333;color:white}.good{color:#087f57;font-weight:bold}
 .actions{display:flex;gap:8px;flex-wrap:wrap}.empty{color:var(--muted);text-align:center;padding:20px}
 @media(max-width:390px){form{grid-template-columns:1fr}.cards{gap:7px}.card{padding:10px}}
 </style></head><body>
@@ -32,10 +32,13 @@ let page='home';const save=()=>localStorage.setItem('alsane_db',JSON.stringify(d
 db.debts=db.debts.map(d=>({...d,amount:Number(d.amount)||0,paid:Number(d.paid)||0,remaining:Number(d.remaining??((Number(d.amount)||0)-(Number(d.paid)||0))),payments:Array.isArray(d.payments)?d.payments:[]}));
 db.suppliers=db.suppliers.map(s=>({...s,originalAmount:Number(s.originalAmount??s.amount)||0,paid:Number(s.paid)||0,remaining:Number(s.remaining??s.amount)||0,payments:Array.isArray(s.payments)?s.payments:[]}));
 save();
-function recordCustomerPayment(i){let d=db.debts[i],v=Number(prompt('كم المبلغ الذي سدده الزبون؟',d.remaining));if(!Number.isFinite(v)||v<=0)return;if(v>d.remaining){alert('المبلغ أكبر من الدين المتبقي');return;}d.paid+=v;d.remaining-=v;d.payments.push({amount:v,date:new Date().toLocaleDateString('en-CA'),type:'قبض'});save();render();}
-function editCustomer(i){let d=db.debts[i],name=prompt('اسم الزبون',d.name);if(name===null)return;let amount=Number(prompt('إجمالي الدين الأصلي',d.amount));if(!Number.isFinite(amount)||amount<0)return;let paid=Number(prompt('إجمالي ما سدده الزبون',d.paid));if(!Number.isFinite(paid)||paid<0||paid>amount){alert('تحقق من المبالغ');return;}d.name=name;d.amount=amount;d.paid=paid;d.remaining=amount-paid;save();render();}
-function recordSupplierPayment(i){let s=db.suppliers[i],v=Number(prompt('كم دفعت للمورد؟',s.remaining));if(!Number.isFinite(v)||v<=0)return;if(v>s.remaining){alert('المبلغ أكبر من المستحق للمورد');return;}s.paid+=v;s.remaining-=v;s.payments.push({amount:v,date:new Date().toLocaleDateString('en-CA'),type:'دفع'});save();render();}
-function editSupplier(i){let s=db.suppliers[i],name=prompt('اسم المورد',s.name);if(name===null)return;let amount=Number(prompt('إجمالي المبلغ المستحق للمورد',s.originalAmount));if(!Number.isFinite(amount)||amount<0)return;let paid=Number(prompt('إجمالي ما دفعته للمورد',s.paid));if(!Number.isFinite(paid)||paid<0||paid>amount){alert('تحقق من المبالغ');return;}s.name=name;s.originalAmount=amount;s.amount=amount;s.paid=paid;s.remaining=amount-paid;save();render();}
+let selectedIndex=0;
+function editCustomer(i){selectedIndex=i;page='editDebt';render()}
+function recordCustomerPayment(i){selectedIndex=i;page='payDebt';render()}
+function editSupplier(i){selectedIndex=i;page='editSupplier';render()}
+function recordSupplierPayment(i){selectedIndex=i;page='paySupplier';render()}
+function editForm(kind){let isDebt=kind==='debt',obj=isDebt?db.debts[selectedIndex]:db.suppliers[selectedIndex],title=isDebt?'تعديل حساب الزبون':'تعديل حساب المورد';if(!obj)return '<section class="panel">الحساب غير موجود<button onclick="go(\''+(isDebt?'debts':'suppliers')+'\')">رجوع</button></section>';return '<section class="panel"><h2>'+title+'</h2><form id="editEntry">'+field('name','الاسم')+(isDebt?'':field('phone','رقم الهاتف'))+field('amount',isDebt?'إجمالي الدين':'إجمالي المستحق','number')+field('paid',isDebt?'إجمالي المسدد':'إجمالي المدفوع','number')+'<div class="wide actions"><button type="submit">حفظ التعديلات</button><button type="button" class="danger" onclick="go(\''+(isDebt?'debts':'suppliers')+'\')">إلغاء</button></div></form></section>'}
+function paymentForm(kind){let isDebt=kind==='debt',obj=isDebt?db.debts[selectedIndex]:db.suppliers[selectedIndex];if(!obj)return '';return '<section class="panel"><h2>'+(isDebt?'تسجيل سداد من الزبون':'تسجيل دفعة للمورد')+'</h2><p>الرصيد المتبقي: <b>'+money(obj.remaining)+'</b></p><form id="paymentEntry">'+field('amount','مبلغ الدفعة','number')+field('date','تاريخ الدفعة','date')+'<div class="wide actions"><button type="submit">تأكيد الدفعة</button><button type="button" class="danger" onclick="go(\''+(isDebt?'debts':'suppliers')+'\')">إلغاء</button></div></form></section>'}
 
 const money=n=>(Number(n)||0).toLocaleString('ar-EG')+' ر.ي';
 const sum=(a,k)=>a.reduce((s,x)=>s+(Number(x[k])||0),0);
@@ -52,6 +55,8 @@ function suppliers(){return formPage('إضافة مورد','أدخل إجمال�
 function expenses(){return formPage('تسجيل مصروف','مثل الإيجار والكهرباء والنقل والأجور.',field('note','نوع المصروف')+field('amount','المبلغ','number')+field('date','التاريخ','date'),'حفظ المصروف')+'<section class="panel"><h2>سجل المصروفات</h2>'+list(db.expenses)+'</section>'}
 function reports(){let sales=sum(db.sales,'total'),cost=sum(db.sales,'cost'),expenses=sum(db.expenses,'amount'),debts=sum(db.debts,'remaining');return '<section class="panel"><h2>ملخص الحسابات</h2>'+[['إجمالي المبيعات',sales],['تكلفة البضاعة المباعة',cost],['الربح الإجمالي',sales-cost],['المصروفات',expenses],['صافي الربح التقديري',sales-cost-expenses],['ديون الزبائن',debts]].map(x=>'<div class="item"><span>'+x[0]+'</span><b>'+money(x[1])+'</b></div>').join('')+'<p class="muted">هذه التقارير مبنية على العمليات التي سجلتها داخل التطبيق.</p><button onclick="exportData()">تصدير نسخة احتياطية</button></section>'}
 function exportData(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.download='alsane-backup.json';a.click();URL.revokeObjectURL(a.href)}
-function render(){nav();let el=document.getElementById('app');el.innerHTML=page==='home'?dashboard():page==='products'?products():page==='sales'?sales():page==='debts'?debts():page==='suppliers'?suppliers():page==='expenses'?expenses():reports();let f=document.getElementById('entry');if(f)f.onsubmit=e=>{e.preventDefault();let d=Object.fromEntries(new FormData(f));if(page==='products')db.products.push({name:d.name,buy:+d.buy,sell:+d.sell,qty:+d.qty});if(page==='sales')db.sales.push({name:d.name,total:+d.total,cost:+d.cost,date:d.date||new Date().toISOString().slice(0,10)});if(page==='debts'){if(+d.paid<0||+d.paid>+d.amount){alert('تحقق من المبلغ المسدد');return;}db.debts.push({name:d.name,amount:+d.amount,paid:+d.paid,remaining:+d.amount-(+d.paid),date:d.date,payments:[]});}if(page==='suppliers'){if(+d.paid<0||+d.paid>+d.amount){alert('تحقق من المبلغ المدفوع');return;}db.suppliers.push({...d,amount:+d.amount,originalAmount:+d.amount,paid:+d.paid,remaining:+d.amount-(+d.paid),payments:[]});}if(page==='expenses')db.expenses.push({note:d.note,amount:+d.amount,date:d.date});save();render();alert('تم الحفظ بنجاح')}}
+function render(){nav();let el=document.getElementById('app');el.innerHTML=page==='home'?dashboard():page==='products'?products():page==='sales'?sales():page==='debts'?debts():page==='suppliers'?suppliers():page==='editDebt'?editForm('debt'):page==='editSupplier'?editForm('supplier'):page==='payDebt'?paymentForm('debt'):page==='paySupplier'?paymentForm('supplier'):page==='expenses'?expenses():reports();let ef=document.getElementById('editEntry');if(ef){let obj=page==='editDebt'?db.debts[selectedIndex]:db.suppliers[selectedIndex];ef.elements.name.value=obj.name||'';if(ef.elements.phone)ef.elements.phone.value=obj.phone||'';ef.elements.amount.value=page==='editDebt'?obj.amount:obj.originalAmount;ef.elements.paid.value=obj.paid;ef.onsubmit=e=>{e.preventDefault();let d=Object.fromEntries(new FormData(ef)),amount=Number(d.amount),paid=Number(d.paid);if(!d.name.trim()||!Number.isFinite(amount)||!Number.isFinite(paid)||amount<0||paid<0||paid>amount){alert('تحقق من الاسم والمبالغ؛ المسدد لا يمكن أن يتجاوز الإجمالي');return;}obj.name=d.name.trim();if('phone'in d)obj.phone=d.phone;obj.amount=amount;obj.originalAmount=amount;obj.paid=paid;obj.remaining=amount-paid;save();page=page==='editDebt'?'debts':'suppliers';render();alert('تم تحديث الحساب بنجاح');};}
+let pf=document.getElementById('paymentEntry');if(pf){pf.elements.date.value=new Date().toISOString().slice(0,10);pf.onsubmit=e=>{e.preventDefault();let d=Object.fromEntries(new FormData(pf)),v=Number(d.amount),isDebt=page==='payDebt',obj=isDebt?db.debts[selectedIndex]:db.suppliers[selectedIndex];if(!Number.isFinite(v)||v<=0||v>obj.remaining){alert('أدخل مبلغاً صحيحاً لا يتجاوز الرصيد المتبقي');return;}obj.paid+=v;obj.remaining-=v;obj.payments.push({amount:v,date:d.date||new Date().toISOString().slice(0,10),type:isDebt?'قبض':'دفع'});save();page=isDebt?'debts':'suppliers';render();alert('تم تسجيل الدفعة وتحديث الرصيد');};}
+let f=document.getElementById('entry');if(f)f.onsubmit=e=>{e.preventDefault();let d=Object.fromEntries(new FormData(f));if(page==='products')db.products.push({name:d.name,buy:+d.buy,sell:+d.sell,qty:+d.qty});if(page==='sales')db.sales.push({name:d.name,total:+d.total,cost:+d.cost,date:d.date||new Date().toISOString().slice(0,10)});if(page==='debts'){if(+d.paid<0||+d.paid>+d.amount){alert('تحقق من المبلغ المسدد');return;}db.debts.push({name:d.name,amount:+d.amount,paid:+d.paid,remaining:+d.amount-(+d.paid),date:d.date,payments:[]});}if(page==='suppliers'){if(+d.paid<0||+d.paid>+d.amount){alert('تحقق من المبلغ المدفوع');return;}db.suppliers.push({...d,amount:+d.amount,originalAmount:+d.amount,paid:+d.paid,remaining:+d.amount-(+d.paid),payments:[]});}if(page==='expenses')db.expenses.push({note:d.note,amount:+d.amount,date:d.date});save();render();alert('تم الحفظ بنجاح')}}
 render();
 </script></body></html>
