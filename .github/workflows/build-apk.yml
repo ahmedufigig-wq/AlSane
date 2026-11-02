@@ -1,4 +1,4 @@
-name: Build Al-Sane APK
+name: Build Makhzani APK
 on:
   workflow_dispatch:
   push:
@@ -19,5 +19,5 @@ jobs:
         run: gradle assembleDebug
       - uses: actions/upload-artifact@v4
         with:
-          name: AlSane-debug-apk
+          name: Makhzani-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
